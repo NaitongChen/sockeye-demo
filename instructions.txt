@@ -1,0 +1,141 @@
+######################
+# set up ssh and sftp
+######################
+ssh
+sudo apt install openssh-client
+
+########################
+# connecting to sockeye
+# need two-factor auth
+# shows upcoming maintenance
+########################
+ssh <cwl>@sockeye.arc.ubc.ca
+
+########################
+# /home/<cwl> - home directory / private 
+	         - config, software, etc.
+		   - 50GB storage
+# /arc/project/st-tdjc-1 - project directory
+			 - 5TB storage
+			 - project code / input data / software
+# /scratch/st-tdjc-1 - place to store output data (not long term)
+		     - only place with write access while running batch jobs
+########################
+pwd
+
+module load git
+module spider for dependencies
+
+########################
+# file transfer
+# new terminal
+# regular commands -> points to remote
+# l + regular commands -> points to local
+# get to download from remote
+# put to upload to remote
+# look up sftp commands for more: r for recursive
+########################
+sftp <cwl>@dtn.sockeye.arc.ubc.ca
+lcd projects/misc/demo
+put demo_to_remote.txt
+get demo_to_local.txt
+cd ~
+cat demo_to_remote.txt
+
+###############
+# show storage workflow
+https://confluence.it.ubc.ca/display/UARC/Quickstart+Guide
+long term storage file in allocation folder
+pbs and script and output in scratch
+or run everything in project allocation: but read only
+###############
+
+# load softwares and save for future use
+# only needs to be done once
+module load gcc miniconda3
+module save julia-w-conda
+
+# easy loading of modules
+module restore julia-w-conda
+
+# create conda enviornment
+# only needs to be done once
+conda create --prefix /arc/project/st-tdjc-1/<conda-env-name>
+
+# activate conda enviornment
+source activate /arc/project/st-tdjc-1/<conda-env-name>
+
+##############
+if error, run the following lines before activating
+conda init bash
+source ~/.bashrc
+##############
+
+# specify package storage directory to be within project
+# creates conda configuration file
+conda config
+# specifies directory where packages are to be stored
+conda config --add pkgs_dirs /arc/project/st-tdjc-1/<conda-env-name>
+
+# install julia
+conda install -c conda-forge julia
+
+######################
+# optional: configure git
+# e.g. for when working with private packages
+######################
+# configure github ssh key so that we can load private packages
+# https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key
+# https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account#adding-a-new-ssh-key-to-your-account
+
+# verify github ssh connection
+ssh -T git@github.com
+
+####################
+https://confluence.it.ubc.ca/display/UARC/About+Sockeye
+####################
+
+select=a:ncpus=b:mem=cgb
+
+# a nodes, each node with b cpus and c memory
+# base node: 2 cpus, each with 16 cores
+
+####################
+# move to scratch to prepare julia script
+####################
+cd /scratch/st-tdjc-1
+mkdir <some-folder>
+cd <some-folder>
+git clone https://github.com/NaitongChen/sockeye-demo.git
+cd sockeye-demo
+
+module unload curl
+
+# change your path
+
+sh init-config.sh
+
+####################
+# running jobs
+####################
+qsub
+qstat
+qstat -t []
+qstat -f # estimated start time, roughly twice as slow
+qstat -u <cwl>
+
+julia --project=jlenv
+using JLD
+JLD.load("../dat.jld")["v"]
+JLD.load("../dat_1.jld")["v"]
+
+
+####################
+# common issues
+####################
+write access (stan path etc.)
+precompile (invalidation)
+logging
+suggestion: test at login node
+
+
