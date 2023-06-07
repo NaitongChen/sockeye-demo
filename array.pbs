@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#PBS -l walltime=00:05:00,select=1:ncpus=1:mem=2gb
+#PBS -N array_demo
+#PBS -A st-tdjc-1
+#PBS -m abe
+#PBS -M naitong.chen@stat.ubc.ca
+#PBS -o /scratch/st-tdjc-1/naitong-demo/output_^array_index^.txt
+#PBS -e /scratch/st-tdjc-1/naitong-demo/error_^array_index^.txt
+#PBS -J 1-5
+
+################################################################################
+
+module load gcc miniconda3
+
+cd $PBS_O_WORKDIR
+
+source activate /arc/project/st-tdjc-1/naitong-demo
+
+julia --project=jlenv -t auto /scratch/st-tdjc-1/naitong-demo/sockeye-demo/job.jl $PBS_ARRAY_INDEX
