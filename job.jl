@@ -7,7 +7,7 @@ coef = nothing
 if size(ARGS,1) > 0
     coef = parse(Int, ARGS[1])
 else
-    coef = 100,
+    coef = 100
 end
 
 coef_times_vector = coef * ones(5)
