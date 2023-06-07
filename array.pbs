@@ -15,6 +15,8 @@ module load gcc miniconda3
 
 cd $PBS_O_WORKDIR
 
+which julia
+
 source activate /arc/project/st-tdjc-1/naitong-demo
 
 julia --project=jlenv -t auto /scratch/st-tdjc-1/naitong-demo/sockeye-demo/job.jl $PBS_ARRAY_INDEX
